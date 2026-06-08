@@ -21,7 +21,7 @@ class DjinniScraper:
         }
 
         self.target_skills = [
-            "python", "r", "scala", "java", "pandas", "numpy", "spark", "kafka",
+            "python", "r", "scala", "pandas", "numpy", "spark", "kafka",
             "sql", "postgresql", "mysql", "oracle", "mongodb", "nosql",
             "aws", "gcp", "azure", "bigquery", "snowflake", "redshift", "clickhouse",
             "power bi", "tableau", "looker", "qlik", "metabase", "superset", "excel",
