@@ -34,6 +34,8 @@ class Vacancy(Base):
     posted_at = Column(DateTime)
     parsed_at = Column(DateTime)
     is_active = Column(Boolean, default=True)
+    is_sent = Column(Boolean, default=False)
+    is_applied = Column(Boolean, default=False)
 
     skills = relationship("Skill", secondary="vacancy_skills", back_populates="vacancies")
 
