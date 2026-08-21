@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from src.database import SessionLocal, Vacancy
 
 load_dotenv()
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or ""
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or ""
 
 bot = telebot.TeleBot(TOKEN)
 

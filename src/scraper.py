@@ -30,7 +30,8 @@ class DjinniScraper:
         ]
         self.db = SessionLocal()
 
-    def parse_djinni_date(self, date_text):
+    @staticmethod
+    def parse_djinni_date(date_text):
         if not date_text:
             return None
         date_text = date_text.lower()
@@ -53,7 +54,8 @@ class DjinniScraper:
                         pass
         return None
 
-    def clean_title(self, title_text, company_name):
+    @staticmethod
+    def clean_title(title_text, company_name):
         cleaned = re.sub(r'(Швидко Відповідає|Тільки відгуки|Відгуки)', '', title_text, flags=re.IGNORECASE)
         cleaned = cleaned.replace('$', '')
         if company_name and company_name in cleaned:
@@ -146,7 +148,7 @@ class DjinniScraper:
             if not job_links:
                 break
 
-            current_page_hrefs = {link.get('href') for link in job_links}
+            current_page_hrefs = {str(link.get('href')) for link in job_links}
             if current_page_hrefs == previous_page_hrefs:
                 break
             previous_page_hrefs = current_page_hrefs
@@ -155,12 +157,15 @@ class DjinniScraper:
             seen = set()
             for link in job_links:
                 if link.get('href') not in seen:
-                    seen.add(link.get('href'))
+                    seen.add(str(link.get('href')))
                     unique_links.append(link)
 
             for link in unique_links:
                 full_url = "https://djinni.co" + link.get('href')
-                job_id = re.search(r'/jobs/(\d+)-', full_url).group(1)
+                match = re.search(r'/jobs/(\d+)-', full_url)
+                if not match:
+                    continue
+                job_id = match.group(1)
 
                 if self.db.query(Vacancy).filter(Vacancy.id == job_id).first():
                     print(f"  Already in DB: ID {job_id}")
@@ -187,7 +192,7 @@ class DjinniScraper:
 
                 self.db.add(new_vacancy)
 
-                for skill_name in self.extract_skills(details['description']):
+                for skill_name in self.extract_skills(str(details['description'])):
                     skill_obj = self.db.query(Skill).filter(Skill.name == skill_name).first()
                     if not skill_obj:
                         skill_obj = Skill(name=skill_name)
