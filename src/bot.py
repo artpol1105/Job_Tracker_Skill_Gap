@@ -64,7 +64,6 @@ def send_new_vacancies():
         markup = InlineKeyboardMarkup()
         btn_apply = InlineKeyboardButton("✅ Apply", callback_data=f"applied_{vac.id}")
         markup.add(btn_apply)
-        # ... наступний код ...
 
         bot.send_message(CHAT_ID, msg_text, reply_markup=markup, parse_mode="Markdown")
 
