@@ -49,15 +49,21 @@ def send_new_vacancies():
         else:
             emoji = "🔴"
 
+        company_name = vac.company if vac.company else "Не вказано"
+        salary_info = vac.salary if vac.salary else "Не вказано"
+
         msg_text = (
             f"{emoji} *{score}% MATCH* | {vac.title}\n"
-            f"*Skills:* {skills_str}\n"
-            f"*Link:* https://djinni.co/jobs/{vac.id}"
+            f"*Компанія:* {company_name}\n"
+            f"*Зарплата:* {salary_info}\n"
+            f"*Скіли:* {skills_str}\n"
+            f"*Посилання:* https://djinni.co/jobs/{vac.id}"
         )
 
         markup = InlineKeyboardMarkup()
         btn_apply = InlineKeyboardButton("✅ Apply", callback_data=f"applied_{vac.id}")
         markup.add(btn_apply)
+        # ... наступний код ...
 
         bot.send_message(CHAT_ID, msg_text, reply_markup=markup, parse_mode="Markdown")
 
