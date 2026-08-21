@@ -8,7 +8,7 @@ from src.database import SessionLocal, Vacancy, Skill
 
 
 class DjinniScraper:
-    def __init__(self, keyword, exp_level="1y"):
+    def __init__(self, keyword, exp_level):
         self.encoded_keyword = urllib.parse.quote(keyword)
         self.exp_level = exp_level
         self.base_url = f"https://djinni.co/jobs/?all_keywords={self.encoded_keyword}&search_type=basic-search&exp_level={self.exp_level}"
@@ -93,6 +93,19 @@ class DjinniScraper:
         if date_match:
             posted_at = self.parse_djinni_date(date_match.group(1))
 
+        experience = "Не вказано"
+        strong_tags = soup.find_all('strong')
+        for tag in strong_tags:
+            raw_text = tag.get_text(separator=' ', strip=True)
+            if "досвід" in raw_text.lower():
+                experience = re.sub(r'\s+', ' ', raw_text).strip()
+
+                small_tag = tag.find_next_sibling('small')
+                if small_tag and "без досвіду" in small_tag.get_text(strip=True).lower():
+                    clean_small = re.sub(r'\s+', ' ', small_tag.get_text(separator=' ', strip=True)).strip()
+                    experience += f" ({clean_small})"
+                break
+
         for nav in soup.find_all(['nav', 'header']):
             nav.extract()
         desc_blocks = soup.find_all('div', class_='profile-page-section') or soup.find_all('div', class_='mb-4')
@@ -104,6 +117,7 @@ class DjinniScraper:
             "company": company,
             "salary": salary,
             "posted_at": posted_at,
+            "experience": experience,
             "description": joined_desc
         }
 
@@ -116,7 +130,7 @@ class DjinniScraper:
         return found_skills
 
     def fetch_jobs(self):
-        print(f"Searching for '{urllib.parse.unquote(self.encoded_keyword)}' | Experience: {self.exp_level}\n")
+        print(f"Searching for '{urllib.parse.unquote(self.encoded_keyword)}' | URL filters: {self.exp_level}\n")
         page = 1
         total_saved = 0
         previous_page_hrefs = set()
@@ -165,6 +179,7 @@ class DjinniScraper:
                     title=clean_title,
                     company=details['company'],
                     salary=details['salary'],
+                    experience=details['experience'],
                     description=details['description'],
                     posted_at=details['posted_at'],
                     parsed_at=datetime.now()
@@ -182,7 +197,7 @@ class DjinniScraper:
                 self.db.commit()
                 total_saved += 1
 
-                print(f"    Saved: {clean_title} | Company: {details['company']} | Salary: {details['salary']}")
+                print(f"    Saved: {clean_title} | Company: {details['company']} | Exp: {details['experience']}")
                 time.sleep(1.5)
 
             if len(unique_links) < self.items_per_page:
@@ -195,5 +210,5 @@ class DjinniScraper:
 
 
 if __name__ == "__main__":
-    scraper = DjinniScraper(keyword="Data Analyst", exp_level="1y")
+    scraper = DjinniScraper(keyword="Data Analyst", exp_level="no_exp&exp_level=1y")
     scraper.fetch_jobs()

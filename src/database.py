@@ -29,6 +29,7 @@ class Vacancy(Base):
     title = Column(String, nullable=False)
     company = Column(String)
     salary = Column(String, nullable=True)
+    experience = Column(String, nullable=True)  
     description = Column(Text, nullable=False)
     posted_at = Column(DateTime)
     parsed_at = Column(DateTime)

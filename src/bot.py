@@ -56,6 +56,7 @@ def send_new_vacancies():
             f"{emoji} *{score}% MATCH* | {vac.title}\n"
             f"*Компанія:* {company_name}\n"
             f"*Зарплата:* {salary_info}\n"
+            f"*Досвід:* {vac.experience}\n" 
             f"*Скіли:* {skills_str}\n"
             f"*Посилання:* https://djinni.co/jobs/{vac.id}"
         )
